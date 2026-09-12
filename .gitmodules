@@ -1,0 +1,3 @@
+[submodule "modules/module.verification"]
+	path = modules/module.verification
+	url = https://github.com/crafty-racoon/module.verification.git

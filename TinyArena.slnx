@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TinyArena.Application/TinyArena.Application.csproj" />
+    <Project Path="src/TinyArena.Console/TinyArena.Console.csproj" />
+    <Project Path="src/TinyArena.Domain/TinyArena.Domain.csproj" />
+    <Project Path="src/TinyArena.Infrastructure/TinyArena.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TinyArena.Application.Tests/TinyArena.Application.Tests.csproj" />
+    <Project Path="tests/TinyArena.Domain.Tests/TinyArena.Domain.Tests.csproj" />
+  </Folder>
+</Solution>
