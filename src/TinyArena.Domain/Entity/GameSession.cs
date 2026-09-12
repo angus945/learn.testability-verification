@@ -4,6 +4,8 @@ public sealed class GameSession
 {
     private readonly List<Actor> _enemies;
 
+    public GameSessionId Id { get; }
+
     public int Width { get; }
 
     public int Height { get; }
@@ -17,7 +19,7 @@ public sealed class GameSession
     private const int PlayerAttackDamage = 3;
     private const int EnemyAttackDamage = 2;
 
-    public GameSession(int width, int height, Actor player, IEnumerable<Actor> enemies)
+    public GameSession(GameSessionId id, int width, int height, Actor player, IEnumerable<Actor> enemies)
     {
         if (width <= 0)
         {
@@ -34,14 +36,15 @@ public sealed class GameSession
 
         List<Actor> enemyList = enemies.ToList();
 
+        Id = id;
         Width = width;
         Height = height;
-        Player = player;
 
         ValidateInitialState(player, enemyList);
 
+        Player = player;
         _enemies = enemyList.OrderBy(enemy => enemy.Id.Value).ToList();
-        Status = DetermineStatus(player, enemyList);
+        Status = DetermineStatus(player, _enemies);
     }
     private void ValidateInitialState(Actor player, IReadOnlyList<Actor> enemies)
     {
@@ -127,11 +130,6 @@ public sealed class GameSession
             return PlayerMoveResult.GameAlreadyEnded;
         }
 
-        if (Player.IsDead)
-        {
-            return PlayerMoveResult.PlayerDead;
-        }
-
         Position targetPosition = GetTargetPosition(Player.Position, direction);
 
         if (!IsInsideBoard(targetPosition))
@@ -150,16 +148,13 @@ public sealed class GameSession
 
         return PlayerMoveResult.Moved;
     }
-    public PlayerAttackResult PlayerAttack(Direction direction)
+    public PlayerAttackResult PlayerAttack(Direction direction, IRandomSource randomSource)
     {
+        ArgumentNullException.ThrowIfNull(randomSource);
+
         if (Status != GameStatus.Running)
         {
             return PlayerAttackResult.GameAlreadyEnded;
-        }
-
-        if (Player.IsDead)
-        {
-            return PlayerAttackResult.PlayerDead;
         }
 
         Position targetPosition = GetTargetPosition(Player.Position, direction);
@@ -170,7 +165,9 @@ public sealed class GameSession
             return PlayerAttackResult.NoTarget;
         }
 
-        target.ReceiveDamage(PlayerAttackDamage);
+        int damage = randomSource.Next(1, 5);
+
+        target.ReceiveDamage(damage);
 
         CompletePlayerTurn();
 
@@ -322,7 +319,6 @@ public sealed class GameSession
             _ => throw new ArgumentOutOfRangeException(nameof(direction))
         };
     }
-
     private bool IsInsideBoard(Position position)
     {
         return position.X >= 0 &&
@@ -331,16 +327,5 @@ public sealed class GameSession
                position.Y < Height;
     }
 
-    private bool IsOccupied(Position position)
-    {
-        foreach (Actor enemy in _enemies)
-        {
-            if (!enemy.IsDead && enemy.Position == position)
-            {
-                return true;
-            }
-        }
 
-        return false;
-    }
 }

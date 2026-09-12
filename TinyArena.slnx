@@ -6,6 +6,7 @@
     <Project Path="src/TinyArena.Infrastructure/TinyArena.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/TinyArena.AcceptanceTests/TinyArena.AcceptanceTests.csproj" />
     <Project Path="tests/TinyArena.Application.Tests/TinyArena.Application.Tests.csproj" />
     <Project Path="tests/TinyArena.Domain.Tests/TinyArena.Domain.Tests.csproj" />
   </Folder>
