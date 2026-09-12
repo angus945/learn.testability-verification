@@ -4,6 +4,175 @@
 >
 > 本文件是跨對話的學習基準。後續討論若沒有明確要求改變方向，應以本文件為準，不任意提前導入後續階段能力，也不為了展示框架而增加不必要抽象。
 
+## Testability 與測試策略
+
+本專案的主要學習目標是 **Testability Architecture**，不是 TDD、Unit Testing 方法論，也不以測試覆蓋率為主要成果。
+
+因此後續實作預設採用：
+
+```text
+正常設計與實作 Production Code
+↓
+辨識不可控制、不可觀察或難以隔離的部分
+↓
+建立必要的 Testability Seam
+↓
+以少量 Test / Verification 證明該 Seam 有效
+```
+
+而不是：
+
+```text
+先寫 Test
+↓
+Red
+↓
+實作
+↓
+Green
+↓
+Refactor
+```
+
+除非某個階段明確以 TDD 為學習主題，否則不要使用 TDD 作為預設教學流程。
+
+### 測試在本專案中的角色
+
+Test 的主要用途是：
+
+- 驗證 Architecture Boundary 是否成立。
+- 驗證 Dependency 是否真的可以被替換或控制。
+- 驗證 Observation Surface 是否足以從外部判斷系統狀態。
+- 驗證 Testability Seam 是否有效。
+- 驗證 Verification Infrastructure 本身的行為。
+
+Test 不需要：
+
+- 對每個 method 建立完整測試組。
+- 為所有邊界條件追求高 coverage。
+- 為簡單 Value Object 強制執行 Red / Green / Refactor。
+- 為了「可測」而替所有 class 建立 interface。
+- 讓測試結構反過來主導 Domain Model。
+
+對單純且天然可測的 Domain Code，可以正常完成 Production implementation，再以少量測試確認核心規則即可。
+
+### 優先研究的 Testability 問題
+
+後續學習應優先關注：
+
+```text
+Controllability
+Observability
+Determinism
+Isolation
+Stable Entry Point
+Stable Observation Surface
+Failure Explainability
+External Verification
+```
+
+例如：
+
+```text
+Random.Shared
+```
+
+造成結果不可重現時，應研究如何建立 controllable randomness seam。
+
+```text
+Console.WriteLine(...)
+```
+
+成為唯一知道 gameplay 結果的方法時，應研究 observability。
+
+Test 必須直接存取 Aggregate internal state 才能驗證結果時，應研究 stable observation surface。
+
+Test 需要直接修改 Domain internal state 才能建立 scenario 時，應研究 controllability 與 production entry point。
+
+### Production Code 優先
+
+本專案預設從真實產品設計角度實作 Tiny Arena。
+
+Testability 必須服務 Production Architecture，而不是 Production Architecture 服務 Test。
+
+應避免：
+
+```text
+Test-only setter
+Test-only constructor
+Test-only command
+ForceWin()
+SetHealthForTest()
+TeleportForTest()
+直接暴露 internal collection 給測試
+```
+
+如果 Test 很難寫，首先應問：
+
+> 這代表系統缺少合理的 controllability / observability boundary，還是只是這個測試沒有必要？
+
+不要立即增加 test-specific API。
+
+### 測試數量不是進度指標
+
+本專案不以：
+
+```text
+Test Count
+Code Coverage
+Mock Count
+Assertion Count
+```
+
+作為完成度判準。
+
+更重要的判準是：
+
+> 系統是否能透過正常 Application Entry Point 被控制，並透過穩定、被動的 Observation Surface 被外部驗證。
+
+最終目標是：
+
+```text
+External Controller
+        ↓
+Normal Application Entry Point
+        ↓
+Application / Domain
+        ↓
+Committed Result
+        ↓
+Facts / Snapshots
+        ↓
+Invariant / Oracle
+        ↓
+Diagnostics / Evidence
+```
+
+而不是：
+
+```text
+Test
+↓
+直接操作 Internal Object
+↓
+大量 Assert
+```
+
+### 對 AI 助教的額外要求
+
+後續教學不得因為本專案與 Testability 有關，就預設採用 TDD。
+
+AI 應優先：
+
+1. 先協助正常完成目前的 Production Design。
+2. 指出其中實際存在的 Testability Problem。
+3. 解釋該問題屬於 Controllability、Observability、Determinism、Isolation 或其他哪一類。
+4. 只有在需要證明設計有效時，才加入最小必要 Test。
+5. 不為了增加 Test 而增加 abstraction。
+6. 不追求測試完整度，除非該完整度本身就是當前學習目標。
+
+如果 Production Code 本身已經天然容易測試，就不需要額外建立 Testability Infrastructure。
+
 ---
 
 # 1. 專案定位
@@ -99,22 +268,22 @@ Tiny Arena
 
 基礎規則：
 
-| 項目 | 規格 |
-|---|---|
-| 地圖 | 5 × 5 |
-| 玩家 | 1 |
-| 敵人 | 2 個 Slime |
-| 玩家行動 | Move / Attack / Wait |
-| 敵人回合 | 玩家完成合法 Action 後依固定順序執行 |
-| Damage | 初期固定，之後透過 Random abstraction |
-| 勝利條件 | 所有敵人死亡 |
-| 失敗條件 | 玩家死亡 |
-| Presentation | Console |
-| Persistence | 初期 InMemory |
-| Runtime | 單執行緒 |
-| Unity | 不使用 |
-| Network | 不使用 |
-| Database | 不使用 |
+| 項目         | 規格                                  |
+| ------------ | ------------------------------------- |
+| 地圖         | 5 × 5                                 |
+| 玩家         | 1                                     |
+| 敵人         | 2 個 Slime                            |
+| 玩家行動     | Move / Attack / Wait                  |
+| 敵人回合     | 玩家完成合法 Action 後依固定順序執行  |
+| Damage       | 初期固定，之後透過 Random abstraction |
+| 勝利條件     | 所有敵人死亡                          |
+| 失敗條件     | 玩家死亡                              |
+| Presentation | Console                               |
+| Persistence  | 初期 InMemory                         |
+| Runtime      | 單執行緒                              |
+| Unity        | 不使用                                |
+| Network      | 不使用                                |
+| Database     | 不使用                                |
 
 遊戲只是教學載體。
 
