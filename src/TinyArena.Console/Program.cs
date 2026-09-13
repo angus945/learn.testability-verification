@@ -1,5 +1,6 @@
 ﻿using Module.Verification.SystemFact;
 using Module.Verification.SystemFact.Observability;
+using Module.Verification.StateSnapshot;
 using TinyArena.AcceptanceTests;
 using TinyArena.Application;
 using TinyArena.Console;
@@ -16,19 +17,23 @@ DamageConsoleObserver damageObserver = new DamageConsoleObserver();
 PlayerActionRejectedConsoleObserver rejectedObserver = new PlayerActionRejectedConsoleObserver();
 ActorDefeatedConsoleObserver actorDefeatedObserver = new ActorDefeatedConsoleObserver();
 BattleEndedConsoleObserver battleEndedObserver = new BattleEndedConsoleObserver();
+RecordingSystemFactObserver recordingObserver = new RecordingSystemFactObserver();
 factHubBuilder.Register<PlayerActionCommitted>(playerActionObserver);
 factHubBuilder.Register<DamageApplied>(damageObserver);
 factHubBuilder.Register<PlayerActionRejected>(rejectedObserver);
 factHubBuilder.Register<ActorDefeated>(actorDefeatedObserver);
 factHubBuilder.Register<BattleEnded>(battleEndedObserver);
-
-RecordingSystemFactObserver recordingObserver = new RecordingSystemFactObserver();
 factHubBuilder.Register<ISystemFact>(recordingObserver);
-
 SystemFactHub factHub = factHubBuilder.Build();
 
-StartGameUseCase startGame = new StartGameUseCase(repository);
-SubmitPlayerActionUseCase submitPlayerAction = new SubmitPlayerActionUseCase(repository, randomSource, factHub);
+StateSnapshotChannel<GameSessionSnapshot> snapshotChannel = new StateSnapshotChannel<GameSessionSnapshot>(16);
+IStateSnapshotPublisher<GameSessionSnapshot> snapshotPublisher = snapshotChannel.PublisherPort;
+IStateSnapshotReader<GameSessionSnapshot> snapshotReader = snapshotChannel.ReaderPort;
+
+GameSessionSnapshotCapturer snapshotCapturer = new GameSessionSnapshotCapturer();
+GameSessionSnapshotRecorder snapshotRecorder = new GameSessionSnapshotRecorder(snapshotCapturer, snapshotPublisher);
+GameSessionCommitter committer = new GameSessionCommitter(repository, snapshotRecorder, factHub); StartGameUseCase startGame = new StartGameUseCase(committer);
+SubmitPlayerActionUseCase submitPlayerAction = new SubmitPlayerActionUseCase(repository, randomSource, factHub, committer);
 GetGameStateUseCase getGameState = new GetGameStateUseCase(repository);
 GameSessionId sessionId = new GameSessionId(1);
 
@@ -40,8 +45,18 @@ ActorSetup[] enemies = { firstEnemy, secondEnemy };
 StartGameCommand startCommand = new StartGameCommand(sessionId, 5, 5, player, enemies);
 
 startGame.Execute(startCommand);
+StateSnapshotRead<GameSessionSnapshot> firstRead = snapshotReader.ReadLatest();
+Console.WriteLine($"first snapshot capture ID: {firstRead.Reference.CaptureId}");
+StateSnapshotRead<GameSessionSnapshot> secondRead = snapshotReader.ReadLatest();
+Console.WriteLine($"second snapshot capture ID: {secondRead.Reference.CaptureId}");
+
+submitPlayerAction.Execute(sessionId, new PlayerActionCommand.Attack(Direction.Up));
+StateSnapshotRead<GameSessionSnapshot> afterRejected = snapshotReader.ReadLatest();
+Console.WriteLine($"after rejected snapshot capture ID: {afterRejected.Reference.CaptureId}");
 
 submitPlayerAction.Execute(sessionId, new PlayerActionCommand.Move(Direction.Right));
+StateSnapshotRead<GameSessionSnapshot> afterMove = snapshotReader.ReadLatest();
+Console.WriteLine($"after move snapshot capture ID: {afterMove.Reference.CaptureId}");
 
 GameStateDto? state = getGameState.Execute(sessionId);
 

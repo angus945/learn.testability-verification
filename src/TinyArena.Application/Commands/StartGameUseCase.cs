@@ -1,14 +1,15 @@
+using Module.Verification.StateSnapshot;
 using TinyArena.Domain;
 
 namespace TinyArena.Application;
 
 public sealed class StartGameUseCase
 {
-    private readonly IGameSessionRepository _repository;
+    private readonly GameSessionCommitter _committer;
 
-    public StartGameUseCase(IGameSessionRepository repository)
+    public StartGameUseCase(GameSessionCommitter committer)
     {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        _committer = committer ?? throw new ArgumentNullException(nameof(committer));
     }
 
     public GameSessionId Execute(StartGameCommand command)
@@ -22,7 +23,7 @@ public sealed class StartGameUseCase
 
         GameSession session = new GameSession(command.SessionId, command.Width, command.Height, player, enemies);
 
-        _repository.Add(session);
+        _committer.CommitNew(session);
 
         return session.Id;
     }

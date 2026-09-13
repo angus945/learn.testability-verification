@@ -1,6 +1,7 @@
 using TinyArena.Domain;
 using Module.Verification.SystemFact;
 using Module.Verification.SystemFact.Observability;
+using Module.Verification.StateSnapshot;
 
 namespace TinyArena.Application;
 
@@ -9,12 +10,14 @@ public sealed class SubmitPlayerActionUseCase
     private readonly IGameSessionRepository _repository;
     private readonly IRandomSource _randomSource;
     private readonly ISystemFactSink _factSink;
+    public readonly GameSessionCommitter _committer;
 
-    public SubmitPlayerActionUseCase(IGameSessionRepository repository, IRandomSource randomSource, ISystemFactSink factSink)
+    public SubmitPlayerActionUseCase(IGameSessionRepository repository, IRandomSource randomSource, ISystemFactSink factSink, GameSessionCommitter committer)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _randomSource = randomSource ?? throw new ArgumentNullException(nameof(randomSource));
         _factSink = factSink ?? throw new ArgumentNullException(nameof(factSink));
+        _committer = committer ?? throw new ArgumentNullException(nameof(committer));
     }
     public SubmitPlayerActionResult Execute(GameSessionId sessionId, PlayerActionCommand command)
     {
@@ -48,9 +51,7 @@ public sealed class SubmitPlayerActionUseCase
     }
     private void CommitExecutedAction(GameSession session, PlayerActionCommand command)
     {
-        _repository.Update(session);
-
-        PublishDomainFacts(session);
+        _committer.CommitChanges(session);
 
         PlayerActionCommitted fact = new PlayerActionCommitted(session.Id, command);
         _factSink.Publish(fact);
@@ -108,14 +109,5 @@ public sealed class SubmitPlayerActionUseCase
     private static SubmitPlayerActionResult Rejected(PlayerActionRejectionReason reason)
     {
         return new SubmitPlayerActionResult(SubmitPlayerActionOutcome.Rejected, reason);
-    }
-    private void PublishDomainFacts(GameSession session)
-    {
-        IReadOnlyCollection<ISystemFact> facts = session.ReleaseFacts();
-
-        foreach (ISystemFact fact in facts)
-        {
-            _factSink.Publish(fact);
-        }
     }
 }
