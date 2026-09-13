@@ -1,6 +1,8 @@
+using Module.Verification.SystemFact;
+
 namespace TinyArena.Domain;
 
-public sealed class GameSession
+public sealed class GameSession : ISystemFactSource
 {
     private readonly List<Actor> _enemies;
 
@@ -13,6 +15,7 @@ public sealed class GameSession
     public Actor Player { get; }
 
     public IReadOnlyList<Actor> Enemies => _enemies;
+    private readonly List<ISystemFact> _facts = new List<ISystemFact>();
 
     public GameStatus Status { get; private set; }
 
@@ -167,7 +170,7 @@ public sealed class GameSession
 
         int damage = randomSource.Next(1, 5);
 
-        target.ReceiveDamage(damage);
+        ApplyDamage(Player, target, damage);
 
         CompletePlayerTurn();
 
@@ -225,7 +228,7 @@ public sealed class GameSession
 
             if (IsAdjacent(enemy.Position, Player.Position))
             {
-                Player.ReceiveDamage(EnemyAttackDamage);
+                ApplyDamage(enemy, Player, EnemyAttackDamage);
                 UpdateStatus();
 
                 if (Status != GameStatus.Running)
@@ -305,7 +308,16 @@ public sealed class GameSession
 
     private void UpdateStatus()
     {
-        Status = DetermineStatus(Player, _enemies);
+        GameStatus previousStatus = Status;
+        GameStatus nextStatus = DetermineStatus(Player, _enemies);
+
+        Status = nextStatus;
+
+        if (previousStatus == GameStatus.Running && nextStatus != GameStatus.Running)
+        {
+            BattleEnded battleEnded = new BattleEnded(Id, nextStatus);
+            _facts.Add(battleEnded);
+        }
     }
 
     private Position GetTargetPosition(Position current, Direction direction)
@@ -326,6 +338,32 @@ public sealed class GameSession
                position.Y >= 0 &&
                position.Y < Height;
     }
+    private void ApplyDamage(Actor source, Actor target, int requestedDamage)
+    {
+        int previousHealth = target.Health.Current;
 
+        target.ReceiveDamage(requestedDamage);
 
+        int currentHealth = target.Health.Current;
+        int appliedDamage = previousHealth - currentHealth;
+
+        DamageApplied fact = new DamageApplied(Id, source.Id, target.Id, appliedDamage, previousHealth, currentHealth);
+
+        _facts.Add(fact);
+
+        if (previousHealth > 0 && target.IsDead)
+        {
+            ActorDefeated actorDefeated = new ActorDefeated(Id, target.Id, source.Id);
+            _facts.Add(actorDefeated);
+        }
+    }
+
+    public IReadOnlyCollection<ISystemFact> ReleaseFacts()
+    {
+        ISystemFact[] facts = _facts.ToArray();
+
+        _facts.Clear();
+
+        return facts;
+    }
 }

@@ -1,4 +1,6 @@
 using TinyArena.Domain;
+using Module.Verification.SystemFact;
+using Module.Verification.SystemFact.Observability;
 
 namespace TinyArena.Application;
 
@@ -6,11 +8,13 @@ public sealed class SubmitPlayerActionUseCase
 {
     private readonly IGameSessionRepository _repository;
     private readonly IRandomSource _randomSource;
+    private readonly ISystemFactSink _factSink;
 
-    public SubmitPlayerActionUseCase(IGameSessionRepository repository, IRandomSource randomSource)
+    public SubmitPlayerActionUseCase(IGameSessionRepository repository, IRandomSource randomSource, ISystemFactSink factSink)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _randomSource = randomSource ?? throw new ArgumentNullException(nameof(randomSource));
+        _factSink = factSink ?? throw new ArgumentNullException(nameof(factSink));
     }
     public SubmitPlayerActionResult Execute(GameSessionId sessionId, PlayerActionCommand command)
     {
@@ -33,10 +37,28 @@ public sealed class SubmitPlayerActionUseCase
 
         if (result.Outcome == SubmitPlayerActionOutcome.Executed)
         {
-            _repository.Update(session);
+            CommitExecutedAction(session, command);
+        }
+        else if (result.Outcome == SubmitPlayerActionOutcome.Rejected && result.RejectionReason is PlayerActionRejectionReason reason)
+        {
+            PublishRejectedAction(sessionId, command, reason);
         }
 
         return result;
+    }
+    private void CommitExecutedAction(GameSession session, PlayerActionCommand command)
+    {
+        _repository.Update(session);
+
+        PublishDomainFacts(session);
+
+        PlayerActionCommitted fact = new PlayerActionCommitted(session.Id, command);
+        _factSink.Publish(fact);
+    }
+    private void PublishRejectedAction(GameSessionId sessionId, PlayerActionCommand command, PlayerActionRejectionReason reason)
+    {
+        PlayerActionRejected fact = new PlayerActionRejected(sessionId, command, reason);
+        _factSink.Publish(fact);
     }
 
     private SubmitPlayerActionResult ExecuteMove(GameSession session, PlayerActionCommand.Move command)
@@ -86,5 +108,14 @@ public sealed class SubmitPlayerActionUseCase
     private static SubmitPlayerActionResult Rejected(PlayerActionRejectionReason reason)
     {
         return new SubmitPlayerActionResult(SubmitPlayerActionOutcome.Rejected, reason);
+    }
+    private void PublishDomainFacts(GameSession session)
+    {
+        IReadOnlyCollection<ISystemFact> facts = session.ReleaseFacts();
+
+        foreach (ISystemFact fact in facts)
+        {
+            _factSink.Publish(fact);
+        }
     }
 }
