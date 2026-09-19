@@ -6,6 +6,8 @@ using TinyArena.Application;
 using TinyArena.Console;
 using TinyArena.Domain;
 using TinyArena.Infrastructure;
+using Module.Verification.Invariant;
+using TinyArena.Verification;
 
 InMemoryGameSessionRepository repository = new InMemoryGameSessionRepository();
 SystemRandomSource randomSource = new SystemRandomSource();
@@ -25,6 +27,16 @@ factHubBuilder.Register<ActorDefeated>(actorDefeatedObserver);
 factHubBuilder.Register<BattleEnded>(battleEndedObserver);
 factHubBuilder.Register<ISystemFact>(recordingObserver);
 SystemFactHub factHub = factHubBuilder.Build();
+
+InvariantRegistry<GameSessionSnapshot> registry = new InvariantRegistry<GameSessionSnapshot>();
+registry.Register(new HealthRangeInvariant());
+registry.Register(new ActorPositionInvariant());
+registry.Register(new ActorOverlapInvariant());
+registry.Register(new WonStateInvariant());
+registry.Register(new LostStateInvariant());
+registry.Seal();
+
+GameSessionInvariantEvaluator invariantEvaluator = new GameSessionInvariantEvaluator(registry);
 
 StateSnapshotChannel<GameSessionSnapshot> snapshotChannel = new StateSnapshotChannel<GameSessionSnapshot>(16);
 IStateSnapshotPublisher<GameSessionSnapshot> snapshotPublisher = snapshotChannel.PublisherPort;
@@ -47,8 +59,14 @@ StartGameCommand startCommand = new StartGameCommand(sessionId, 5, 5, player, en
 startGame.Execute(startCommand);
 StateSnapshotRead<GameSessionSnapshot> firstRead = snapshotReader.ReadLatest();
 Console.WriteLine($"first snapshot capture ID: {firstRead.Reference.CaptureId}");
-StateSnapshotRead<GameSessionSnapshot> secondRead = snapshotReader.ReadLatest();
-Console.WriteLine($"second snapshot capture ID: {secondRead.Reference.CaptureId}");
+// StateSnapshotRead<GameSessionSnapshot> secondRead = snapshotReader.ReadLatest();
+// Console.WriteLine($"second snapshot capture ID: {secondRead.Reference.CaptureId}");
+if (firstRead.State == StateSnapshotReadState.Available)
+{
+
+    InvariantEvaluation evaluation = invariantEvaluator.Evaluate(firstRead.Reference, firstRead.Snapshot);
+    Console.WriteLine($"Invariant evaluation for first snapshot: {(evaluation.IsSatisfied ? "Satisfied" : "Violated")}");
+}
 
 submitPlayerAction.Execute(sessionId, new PlayerActionCommand.Attack(Direction.Up));
 StateSnapshotRead<GameSessionSnapshot> afterRejected = snapshotReader.ReadLatest();

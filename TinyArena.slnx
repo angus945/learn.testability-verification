@@ -43,10 +43,12 @@
     <Project Path="src/TinyArena.Console/TinyArena.Console.csproj" />
     <Project Path="src/TinyArena.Domain/TinyArena.Domain.csproj" />
     <Project Path="src/TinyArena.Infrastructure/TinyArena.Infrastructure.csproj" />
+    <Project Path="src/TinyArena.Verification/TinyArena.Verification.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/TinyArena.AcceptanceTests/TinyArena.AcceptanceTests.csproj" />
     <Project Path="tests/TinyArena.Application.Tests/TinyArena.Application.Tests.csproj" />
     <Project Path="tests/TinyArena.Domain.Tests/TinyArena.Domain.Tests.csproj" />
+    <Project Path="tests/TinyArena.Verification.Tests/TinyArena.Verification.Tests.csproj" />
   </Folder>
 </Solution>

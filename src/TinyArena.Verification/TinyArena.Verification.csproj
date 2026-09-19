@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\TinyArena.Domain\TinyArena.Domain.csproj" />
     <ProjectReference Include="..\TinyArena.Application\TinyArena.Application.csproj" />
-    <ProjectReference Include="..\TinyArena.Infrastructure\TinyArena.Infrastructure.csproj" />
-    <ProjectReference Include="..\TinyArena.Verification\TinyArena.Verification.csproj" />
+    <ProjectReference Include="..\..\modules\module.verification\Module.Verification.SystemFact\src\Module.Verification.SystemFact.csproj" />
     <ProjectReference Include="..\..\modules\module.verification\Module.Verification.SystemFact.Observability\src\Module.Verification.SystemFact.Observability.csproj" />
     <ProjectReference Include="..\..\modules\module.verification\Module.Verification.Diagnostics\src\Diagnostics\Module.Verification.Diagnostics.csproj" />
     <ProjectReference Include="..\..\modules\module.verification\Module.Verification.Evidence\src\Module.Verification.Evidence.csproj" />
@@ -11,12 +11,10 @@
     <ProjectReference Include="..\..\modules\module.verification\Module.Verification.Oracle\src\Module.Verification.Oracle.csproj" />
     <ProjectReference Include="..\..\modules\module.verification\Module.Verification.RuntimeControl\src\Module.Verification.RuntimeControl.csproj" />
     <ProjectReference Include="..\..\modules\module.verification\Module.Verification.StateSnapshot\src\Module.Verification.StateSnapshot.csproj" />
-    <ProjectReference Include="..\..\modules\module.verification\Module.Verification.SystemFact\src\Module.Verification.SystemFact.csproj" />
     <ProjectReference Include="..\..\modules\module.verification\Module.Verification.TraceBuffer\src\Module.Verification.TraceBuffer.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
