@@ -2,7 +2,7 @@
 
 使用純 .NET 小型遊戲，練習 **Testability Architecture**、**DDD** 與 **Clean Architecture**。
 
-本專案會逐步導入 [`crafty-racoon/module.verification`](https://github.com/crafty-racoon/module.verification)，練習如何讓系統具備：
+本專案會逐步導入 [`crafty-racoon/workspace.verification`](https://github.com/crafty-racoon/workspace.verification)，練習如何讓系統具備：
 
 * Controllability
 * Observability
@@ -65,7 +65,7 @@ learn.testability-verification/
 │  └─ TinyArena.AcceptanceTests/
 │
 ├─ modules/
-│  └─ module.verification/
+│  └─ workspace.verification/
 │
 ├─ docs/
 │  └─ LEARNING_CHARTER.md
@@ -73,12 +73,12 @@ learn.testability-verification/
 └─ TinyArena.sln
 ```
 
-## module.verification
+## workspace.verification
 
-`module.verification` 以 Git Submodule 引入：
+`workspace.verification` 以 Git Submodule 引入：
 
 ```bash
-git submodule add https://github.com/crafty-racoon/module.verification.git modules/module.verification
+git submodule add https://github.com/crafty-racoon/workspace.verification.git modules/workspace.verification
 ```
 
 Clone 專案時：
@@ -131,7 +131,7 @@ Diagnostics / Evidence
 
 ## 核心原則
 
-本專案不是為了展示 `module.verification` API。
+本專案不是為了展示 `workspace.verification` API。
 
 目標是先建立一個本身具有良好可測試性的系統，再讓 verification 能力從外部接入。
 

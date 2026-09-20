@@ -1,6 +1,6 @@
 # learn.testability-verification — Learning Charter
 
-> 用純 .NET 小型遊戲，練習以 DDD / Clean Architecture 建立「可控制、可觀察、可驗證」的系統，並逐步導入 `crafty-racoon/module.verification`。
+> 用純 .NET 小型遊戲，練習以 DDD / Clean Architecture 建立「可控制、可觀察、可驗證」的系統，並逐步導入 `crafty-racoon/workspace.verification`。
 >
 > 本文件是跨對話的學習基準。後續討論若沒有明確要求改變方向，應以本文件為準，不任意提前導入後續階段能力，也不為了展示框架而增加不必要抽象。
 
@@ -203,7 +203,7 @@ Learning Project
    - External oracle verification
    - Failure diagnostics
    - Evidence collection
-4. 練習正確採用 `module.verification`，而不是讓 verification framework 反過來主導產品架構。
+4. 練習正確採用 `workspace.verification`，而不是讓 verification framework 反過來主導產品架構。
 5. 保持純 .NET，不依賴 Unity。
 
 ---
@@ -312,7 +312,7 @@ learn.testability-verification/
 │  └─ TinyArena.AcceptanceTests/
 │
 ├─ modules/
-│  └─ module.verification/
+│  └─ workspace.verification/
 │
 ├─ docs/
 │  └─ LEARNING_CHARTER.md
@@ -322,12 +322,12 @@ learn.testability-verification/
 
 ---
 
-# 5. module.verification 引入方式
+# 5. workspace.verification 引入方式
 
-`crafty-racoon/module.verification` 使用 Git submodule：
+`crafty-racoon/workspace.verification` 使用 Git submodule：
 
 ```text
-modules/module.verification
+modules/workspace.verification
 ```
 
 概念：
@@ -335,12 +335,12 @@ modules/module.verification
 ```text
 learn.testability-verification
 └─ modules/
-   └─ module.verification/
+   └─ workspace.verification/
 ```
 
 主專案負責：
 
-- 決定使用哪一個 module.verification commit。
+- 決定使用哪一個 workspace.verification commit。
 - 決定哪些 verification modules 被實際引用。
 - 建立 TinyArena 專屬 adapter。
 - 建立 Composition Root。
@@ -349,8 +349,8 @@ learn.testability-verification
 禁止：
 
 ```text
-src/TinyArena.Domain/module.verification
-src/TinyArena.Application/module.verification
+src/TinyArena.Domain/workspace.verification
+src/TinyArena.Application/workspace.verification
 ```
 
 也不要把 submodule 放進任何單一 bounded context 內。
@@ -516,7 +516,7 @@ Acceptance Test 必須盡量經過正式 Application Entry Point。
 
 # 9. Verification Module 的角色
 
-目前 `module.verification` 中的重要能力分工如下。
+目前 `workspace.verification` 中的重要能力分工如下。
 
 ## SystemFact
 
@@ -1565,15 +1565,15 @@ Acceptance Test 優先：
 這個專案成功的判準不是：
 
 ```text
-使用了多少 module.verification API
+使用了多少 workspace.verification API
 ```
 
 而是：
 
-> 即使拿掉 `module.verification`，TinyArena 本身仍然具有乾淨的 Domain、清楚的 Application Boundary，以及良好的 dependency seams。
+> 即使拿掉 `workspace.verification`，TinyArena 本身仍然具有乾淨的 Domain、清楚的 Application Boundary，以及良好的 dependency seams。
 
 然後：
 
-> `module.verification` 能透過外部 adapter，對正常產品路徑提供控制、觀察、驗證與 evidence，而不需要侵入核心 gameplay。
+> `workspace.verification` 能透過外部 adapter，對正常產品路徑提供控制、觀察、驗證與 evidence，而不需要侵入核心 gameplay。
 
 這才是本專案真正要練的 Testability Architecture。

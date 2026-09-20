@@ -22,15 +22,15 @@
     <ProjectReference Include="..\..\src\TinyArena.Application\TinyArena.Application.csproj" />
     <ProjectReference Include="..\..\src\TinyArena.Infrastructure\TinyArena.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\TinyArena.Domain\TinyArena.Domain.csproj" />
-    <ProjectReference Include="..\..\modules\module.verification\Module.Verification.Diagnostics\src\Diagnostics\Module.Verification.Diagnostics.csproj" />
-    <ProjectReference Include="..\..\modules\module.verification\Module.Verification.Evidence\src\Module.Verification.Evidence.csproj" />
-    <ProjectReference Include="..\..\modules\module.verification\Module.Verification.Invariant\src\Module.Verification.Invariant.csproj" />
-    <ProjectReference Include="..\..\modules\module.verification\Module.Verification.Oracle\src\Module.Verification.Oracle.csproj" />
-    <ProjectReference Include="..\..\modules\module.verification\Module.Verification.RuntimeControl\src\Module.Verification.RuntimeControl.csproj" />
-    <ProjectReference Include="..\..\modules\module.verification\Module.Verification.StateSnapshot\src\Module.Verification.StateSnapshot.csproj" />
-    <ProjectReference Include="..\..\modules\module.verification\Module.Verification.SystemFact\src\Module.Verification.SystemFact.csproj" />
-    <ProjectReference Include="..\..\modules\module.verification\Module.Verification.SystemFact.Observability\src\Module.Verification.SystemFact.Observability.csproj" />
-    <ProjectReference Include="..\..\modules\module.verification\Module.Verification.TraceBuffer\src\Module.Verification.TraceBuffer.csproj" />
+    <ProjectReference Include="..\..\modules\workspace.verification\Module.Verification.Diagnostics\src\Diagnostics\Module.Verification.Diagnostics.csproj" />
+    <ProjectReference Include="..\..\modules\workspace.verification\Module.Verification.Evidence\src\Module.Verification.Evidence.csproj" />
+    <ProjectReference Include="..\..\modules\workspace.verification\Module.Verification.Invariant\src\Module.Verification.Invariant.csproj" />
+    <ProjectReference Include="..\..\modules\workspace.verification\Module.Verification.Oracle\src\Module.Verification.Oracle.csproj" />
+    <ProjectReference Include="..\..\modules\workspace.verification\Module.Verification.RuntimeControl\src\Module.Verification.RuntimeControl.csproj" />
+    <ProjectReference Include="..\..\modules\workspace.verification\Module.Verification.StateSnapshot\src\Module.Verification.StateSnapshot.csproj" />
+    <ProjectReference Include="..\..\modules\workspace.verification\Module.Verification.SystemFact\src\Module.Verification.SystemFact.csproj" />
+    <ProjectReference Include="..\..\modules\workspace.verification\Module.Verification.SystemFact.Observability\src\Module.Verification.SystemFact.Observability.csproj" />
+    <ProjectReference Include="..\..\modules\workspace.verification\Module.Verification.TraceBuffer\src\Module.Verification.TraceBuffer.csproj" />
   </ItemGroup>
 
 </Project>

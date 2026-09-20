@@ -1,42 +1,42 @@
 <Solution>
   <Folder Name="/modules/" />
-  <Folder Name="/modules/module.verification/" />
-  <Folder Name="/modules/module.verification/Module.Verification.Diagnostics/" />
-  <Folder Name="/modules/module.verification/Module.Verification.Diagnostics/src/" />
-  <Folder Name="/modules/module.verification/Module.Verification.Diagnostics/src/Diagnostics/">
-    <Project Path="modules/module.verification/Module.Verification.Diagnostics/src/Diagnostics/Module.Verification.Diagnostics.csproj" />
+  <Folder Name="/modules/workspace.verification/" />
+  <Folder Name="/modules/workspace.verification/Module.Verification.Diagnostics/" />
+  <Folder Name="/modules/workspace.verification/Module.Verification.Diagnostics/src/" />
+  <Folder Name="/modules/workspace.verification/Module.Verification.Diagnostics/src/Diagnostics/">
+    <Project Path="modules/workspace.verification/Module.Verification.Diagnostics/src/Diagnostics/Module.Verification.Diagnostics.csproj" />
   </Folder>
-  <Folder Name="/modules/module.verification/Module.Verification.Evidence/" />
-  <Folder Name="/modules/module.verification/Module.Verification.Evidence/src/">
-    <Project Path="modules/module.verification/Module.Verification.Evidence/src/Module.Verification.Evidence.csproj" />
+  <Folder Name="/modules/workspace.verification/Module.Verification.Evidence/" />
+  <Folder Name="/modules/workspace.verification/Module.Verification.Evidence/src/">
+    <Project Path="modules/workspace.verification/Module.Verification.Evidence/src/Module.Verification.Evidence.csproj" />
   </Folder>
-  <Folder Name="/modules/module.verification/Module.Verification.Invariant/" />
-  <Folder Name="/modules/module.verification/Module.Verification.Invariant/src/">
-    <Project Path="modules/module.verification/Module.Verification.Invariant/src/Module.Verification.Invariant.csproj" />
+  <Folder Name="/modules/workspace.verification/Module.Verification.Invariant/" />
+  <Folder Name="/modules/workspace.verification/Module.Verification.Invariant/src/">
+    <Project Path="modules/workspace.verification/Module.Verification.Invariant/src/Module.Verification.Invariant.csproj" />
   </Folder>
-  <Folder Name="/modules/module.verification/Module.Verification.Oracle/" />
-  <Folder Name="/modules/module.verification/Module.Verification.Oracle/src/">
-    <Project Path="modules/module.verification/Module.Verification.Oracle/src/Module.Verification.Oracle.csproj" />
+  <Folder Name="/modules/workspace.verification/Module.Verification.Oracle/" />
+  <Folder Name="/modules/workspace.verification/Module.Verification.Oracle/src/">
+    <Project Path="modules/workspace.verification/Module.Verification.Oracle/src/Module.Verification.Oracle.csproj" />
   </Folder>
-  <Folder Name="/modules/module.verification/Module.Verification.RuntimeControl/" />
-  <Folder Name="/modules/module.verification/Module.Verification.RuntimeControl/src/">
-    <Project Path="modules/module.verification/Module.Verification.RuntimeControl/src/Module.Verification.RuntimeControl.csproj" />
+  <Folder Name="/modules/workspace.verification/Module.Verification.RuntimeControl/" />
+  <Folder Name="/modules/workspace.verification/Module.Verification.RuntimeControl/src/">
+    <Project Path="modules/workspace.verification/Module.Verification.RuntimeControl/src/Module.Verification.RuntimeControl.csproj" />
   </Folder>
-  <Folder Name="/modules/module.verification/Module.Verification.StateSnapshot/" />
-  <Folder Name="/modules/module.verification/Module.Verification.StateSnapshot/src/">
-    <Project Path="modules/module.verification/Module.Verification.StateSnapshot/src/Module.Verification.StateSnapshot.csproj" />
+  <Folder Name="/modules/workspace.verification/Module.Verification.StateSnapshot/" />
+  <Folder Name="/modules/workspace.verification/Module.Verification.StateSnapshot/src/">
+    <Project Path="modules/workspace.verification/Module.Verification.StateSnapshot/src/Module.Verification.StateSnapshot.csproj" />
   </Folder>
-  <Folder Name="/modules/module.verification/Module.Verification.SystemFact.Observability/" />
-  <Folder Name="/modules/module.verification/Module.Verification.SystemFact.Observability/src/">
-    <Project Path="modules/module.verification/Module.Verification.SystemFact.Observability/src/Module.Verification.SystemFact.Observability.csproj" />
+  <Folder Name="/modules/workspace.verification/Module.Verification.SystemFact.Observability/" />
+  <Folder Name="/modules/workspace.verification/Module.Verification.SystemFact.Observability/src/">
+    <Project Path="modules/workspace.verification/Module.Verification.SystemFact.Observability/src/Module.Verification.SystemFact.Observability.csproj" />
   </Folder>
-  <Folder Name="/modules/module.verification/Module.Verification.SystemFact/" />
-  <Folder Name="/modules/module.verification/Module.Verification.SystemFact/src/">
-    <Project Path="modules/module.verification/Module.Verification.SystemFact/src/Module.Verification.SystemFact.csproj" />
+  <Folder Name="/modules/workspace.verification/Module.Verification.SystemFact/" />
+  <Folder Name="/modules/workspace.verification/Module.Verification.SystemFact/src/">
+    <Project Path="modules/workspace.verification/Module.Verification.SystemFact/src/Module.Verification.SystemFact.csproj" />
   </Folder>
-  <Folder Name="/modules/module.verification/Module.Verification.TraceBuffer/" />
-  <Folder Name="/modules/module.verification/Module.Verification.TraceBuffer/src/">
-    <Project Path="modules/module.verification/Module.Verification.TraceBuffer/src/Module.Verification.TraceBuffer.csproj" />
+  <Folder Name="/modules/workspace.verification/Module.Verification.TraceBuffer/" />
+  <Folder Name="/modules/workspace.verification/Module.Verification.TraceBuffer/src/">
+    <Project Path="modules/workspace.verification/Module.Verification.TraceBuffer/src/Module.Verification.TraceBuffer.csproj" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/TinyArena.Application/TinyArena.Application.csproj" />

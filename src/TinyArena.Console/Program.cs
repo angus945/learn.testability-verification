@@ -8,6 +8,7 @@ using TinyArena.Domain;
 using TinyArena.Infrastructure;
 using Module.Verification.Invariant;
 using TinyArena.Verification;
+using Module.Verification.RuntimeControl;
 
 InMemoryGameSessionRepository repository = new InMemoryGameSessionRepository();
 SystemRandomSource randomSource = new SystemRandomSource();
@@ -49,6 +50,9 @@ SubmitPlayerActionUseCase submitPlayerAction = new SubmitPlayerActionUseCase(rep
 GetGameStateUseCase getGameState = new GetGameStateUseCase(repository);
 GameSessionId sessionId = new GameSessionId(1);
 
+
+
+// Setup initial game state
 ActorSetup player = new ActorSetup(new ActorId(1), new Position(2, 2), 10, 10);
 ActorSetup firstEnemy = new ActorSetup(new ActorId(2), new Position(0, 2), 6, 6);
 ActorSetup secondEnemy = new ActorSetup(new ActorId(3), new Position(4, 2), 6, 6);
@@ -83,3 +87,63 @@ if (state is not null)
     Console.WriteLine($"Status: {state.Status}");
     Console.WriteLine($"Player: ({state.Player.Position.X}, {state.Player.Position.Y}) HP {state.Player.CurrentHealth}/{state.Player.MaximumHealth}");
 }
+
+
+// runtime control
+OperationRegistry<GameSessionId> startGameOperations = new OperationRegistry<GameSessionId>("tinyarena.start-game", 0);
+OperationRegistry<SubmitPlayerActionResult> playerActionOperations = new OperationRegistry<SubmitPlayerActionResult>("tinyarena.player-action", 0);
+
+RuntimeOperationExecutor<GameSessionId> startGameExecutor = new RuntimeOperationExecutor<GameSessionId>(startGameOperations);
+RuntimeOperationExecutor<SubmitPlayerActionResult> playerActionExecutor = new RuntimeOperationExecutor<SubmitPlayerActionResult>(playerActionOperations);
+
+TinyArenaRuntimeAdapter runtimeAdapter = new TinyArenaRuntimeAdapter(startGame, submitPlayerAction, startGameExecutor, playerActionExecutor, snapshotReader);
+OperationAdmission admission = runtimeAdapter.SubmitPlayerAction(sessionId, new PlayerActionCommand.Move(Direction.Left), "request-001", "scenario-001");
+if (admission.IsAdmitted)
+{
+    OperationHandle handle = admission.Handle;
+    OperationRead<SubmitPlayerActionResult> read = runtimeAdapter.ReadPlayerAction(handle);
+    OperationCompletion<SubmitPlayerActionResult> completion = read.Completion;
+    switch (completion.State)
+    {
+        case OperationState.Succeeded:
+            Console.WriteLine("Operation succeeded.");
+            break;
+        case OperationState.Rejected:
+            Console.WriteLine("Operation rejected.");
+            break;
+        case OperationState.Failed:
+            Console.WriteLine("Operation failed.");
+            break;
+        default:
+            Console.WriteLine("Unknown operation state.");
+            break;
+    }
+}
+else
+{
+    Console.WriteLine($"Operation was not admitted: {admission.Status} / {admission.Code}");
+    return;
+}
+
+// Read the observation from the operation completion's observation barrier
+OperationRead<SubmitPlayerActionResult> operationRead = runtimeAdapter.ReadPlayerAction(admission.Handle);
+
+string? barrier = operationRead.Completion.ObservationBarrier;
+
+bool decoded = SnapshotObservationBarrier.TryDecode(barrier, out StateSnapshotReference reference);
+
+if (!decoded)
+{
+    throw new InvalidOperationException(
+        "Operation completion does not contain a valid observation barrier.");
+}
+
+StateSnapshotRead<GameSessionSnapshot> snapshotRead = snapshotReader.Read(reference);
+
+if (snapshotRead.State != StateSnapshotReadState.Available)
+{
+    throw new InvalidOperationException(
+        $"Observation is not available. State: {snapshotRead.State}");
+}
+
+InvariantEvaluation operationEvaluation = invariantEvaluator.Evaluate(reference, snapshotRead.Snapshot);
